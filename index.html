@@ -1,0 +1,852 @@
+ <!DOCTYPE html>
+ <html lang="en">
+ <head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Employee Punch In/Out</title>
+ <style>
+ * {
+ }
+ margin: 0;
+ padding: 0;
+ box-sizing: border-box;
+ font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+ body {
+ background: #f0f2f5;
+ min-height: 100vh;
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ }
+ .container {
+ width: 100%;
+ max-width: 600px;
+ padding: 20px;
+ }
+ .header {
+ background: linear-gradient(135deg, #2193b0, #6dd5ed);
+ color: white;
+ padding: 20px;
+ border-radius: 10px;
+ margin-bottom: 20px;
+text-align: center;
+ box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+ }
+ .card {
+ background: white;
+ border-radius: 10px;
+ padding: 30px;
+ box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+ }
+ .employee-form {
+ display: flex;
+ flex-direction: column;
+ gap: 15px;
+ }
+ input {
+ padding: 15px;
+ border: 1px solid #ddd;
+ border-radius: 5px;
+ font-size: 16px;
+ }
+ .buttons {
+ display: flex;
+ gap: 10px;
+ margin-top: 10px;
+ }
+ button {
+ flex: 1;
+ padding: 15px;
+ border: none;
+ border-radius: 5px;
+ cursor: pointer;
+ transition: all 0.3s ease;
+ font-size: 16px;
+ font-weight: bold;
+ }
+.punch-in {
+ background: #4CAF50;
+ color: white;
+ }
+ .punch-out {
+ background: #f44336;
+ color: white;
+ }
+ button:hover {
+ opacity: 0.9;
+ transform: translateY(-2px);
+ }
+ .status-message {
+ text-align: center;
+ margin-top: 20px;
+ padding: 10px;
+ border-radius: 5px;
+ display: none;
+ }
+ .success {
+ background: #e8f5e9;
+ color: #4CAF50;
+ }
+ .error {
+ background: #ffebee;
+ color: #f44336;
+ }
+ .admin-link {
+ text-align: center;
+ margin-top: 20px;
+ }
+ .admin-link a {
+color: #2193b0;
+ text-decoration: none;
+ }
+ .admin-link a:hover {
+ text-decoration: underline;
+ }
+ </style>
+ </head>
+ <body>
+ <div class="container">
+ <div class="header">
+ <h1>Employee Attendance System</h1>
+ </div>
+ <div class="card">
+ <h2 style="margin-bottom: 20px; text-align: center;">Punch
+ In/Out</h2>
+ <div class="employee-form">
+ <input type="text" id="employeeId" placeholder="Enter
+ Employee ID">
+ Name">
+ In</button>
+ Out</button>
+ <input type="text" id="employeeName" placeholder="Enter
+ <div class="buttons">
+ <button class="punch-in" onclick="punchIn()">Punch
+ <button class="punch-out" onclick="punchOut()">Punch
+ </div>
+ </div>
+ <div id="statusMessage" class="status-message"></div>
+ </div>
+ <div class="admin-link">
+ <a href="../employee attendance2/1.html">Go to Admin Dashboard
+ →</a>
+ </div>
+ </div>
+ <script>
+function showMessage(message, type) {
+ const statusMessage =
+ document.getElementById('statusMessage');
+ statusMessage.textContent = message;
+ statusMessage.className = `status-message ${type}`;
+ statusMessage.style.display = 'block';
+ setTimeout(() => {
+ statusMessage.style.display = 'none';
+ }, 3000);
+ }
+ function punchIn() {
+ const id = document.getElementById('employeeId').value;
+ const name = document.getElementById('employeeName').value;
+ if (!id || !name) {
+ showMessage('Please enter both ID and Name', 'error');
+ return;
+ }
+ const attendance = {
+ id,
+ name,
+ punchIn: new Date(),
+ punchOut: null,
+ status: 'in'
+ };
+ let attendanceData =
+ JSON.parse(localStorage.getItem('attendanceData') || '[]');
+ attendanceData.push(attendance);
+ localStorage.setItem('attendanceData',
+ JSON.stringify(attendanceData));
+ showMessage('Successfully punched in!', 'success');
+ clearForm();
+ }
+ function punchOut() {
+ const id = document.getElementById('employeeId').value;
+if (!id) {
+ showMessage('Please enter Employee ID', 'error');
+ return;
+ }
+ let attendanceData =
+ JSON.parse(localStorage.getItem('attendanceData') || '[]');
+ const employee = attendanceData.find(e => e.id === id &&
+ e.status === 'in');
+ if (employee) {
+ employee.punchOut = new Date();
+ employee.status = 'out';
+ localStorage.setItem('attendanceData',
+ JSON.stringify(attendanceData));
+ showMessage('Successfully punched out!', 'success');
+ clearForm();
+ } else {
+ showMessage('No active punch-in found for this employee',
+ 'error');
+ }
+ }
+ function clearForm() {
+ document.getElementById('employeeId').value = '';
+ document.getElementById('employeeName').value = '';
+ }
+ </script>
+ </body>
+ </html>
+ 
+ <!DOCTYPE html>
+<html lang="en">
+ <head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Admin Dashboard</title>
+ <style>
+ /* Your CSS styles remain unchanged */
+ * {
+ margin: 0;
+ padding: 0;
+ box-sizing: border-box;
+ font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+ }
+ body {
+ background: #f0f2f5;
+ }
+ .container {
+ max-width: 1200px;
+ margin: 0 auto;
+ padding: 20px;
+ }
+ .header {
+ background: linear-gradient(135deg, #2193b0, #6dd5ed);
+ color: white;
+ padding: 20px;
+ border-radius: 10px;
+ margin-bottom: 20px;
+ box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+ display: flex;
+ justify-content: space-between;
+ align-items: center;
+ }
+ .header a {
+ color: white;
+ text-decoration: none;
+ padding: 10px 20px;
+border: 2px solid white;
+ border-radius: 5px;
+ transition: all 0.3s ease;
+ }
+ .header a:hover {
+ background: white;
+ color: #2193b0;
+ }
+ .current-date {
+ font-size: 1rem;
+ margin-top: 5px;
+ }
+ .stats {
+ display: grid;
+ grid-template-columns: repeat(3, 1fr);
+ gap: 20px;
+ margin-bottom: 20px;
+ }
+ .stat-card {
+ background: white;
+ padding: 20px;
+ border-radius: 10px;
+ text-align: center;
+ box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+ }
+ .stat-number {
+ font-size: 2em;
+ font-weight: bold;
+ color: #2193b0;
+ }
+ .tabs {
+ display: flex;
+ gap: 10px;
+ margin-bottom: 20px;
+}
+ .tab {
+ padding: 10px 20px;
+ background: white;
+ border-radius: 5px;
+ cursor: pointer;
+ transition: all 0.3s ease;
+ }
+ .tab.active {
+ background: #2193b0;
+ color: white;
+ }
+ .search {
+ margin-bottom: 20px;
+ }
+ .search input {
+ width: 100%;
+ padding: 10px;
+ border: 1px solid #ddd;
+ border-radius: 5px;
+ }
+ .attendance-grid {
+ display: grid;
+ grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+ gap: 20px;
+ }
+ .attendance-card {
+ background: white;
+ border-radius: 10px;
+ padding: 15px;
+ box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+ transition: transform 0.3s ease;
+ }
+.attendance-card:hover {
+ transform: translateY(-5px);
+ }
+ .status {
+ display: inline-block;
+ padding: 5px 10px;
+ border-radius: 15px;
+ font-size: 0.8em;
+ margin-top: 10px;
+ }
+ .status.in {
+ background: #e8f5e9;
+ color: #4CAF50;
+ }
+ .status.out {
+ background: #ffebee;
+ color: #f44336;
+ }
+ @media (max-width: 768px) {
+ .stats {
+ grid-template-columns: 1fr;
+ }
+ }
+ </style>
+ </head>
+ <body>
+ <div class="container">
+ <div class="header">
+ <div>
+ <h1>Admin Dashboard</h1>
+ <div class="current-date" id="currentDate"></div>
+ </div>
+ <a href="../employee attendance/1.html">&larr; Back to Punch
+ In/Out</a>
+ </div>
+<div class="tabs">
+ <div class="tab active"
+ onclick="switchTab('today')">Today</div>
+ <div class="tab" onclick="switchTab('week')">This Week</div>
+ <div class="tab" onclick="switchTab('month')">This Month</div>
+ </div>
+ <div class="search">
+ <input type="text" id="searchInput" placeholder="Search
+ employees..." onkeyup="searchEmployees()">
+ </div>
+ <div class="stats">
+ <div class="stat-card">
+ <div class="stat-number" id="presentCount">0</div>
+ <div>Present Today</div>
+ </div>
+ <div class="stat-card">
+ <div class="stat-number" id="lateCount">0</div>
+ <div>Late Arrivals</div>
+ </div>
+ <div class="stat-card">
+ <div class="stat-number" id="avgHours">0</div>
+ <div>Avg Hours Today</div>
+ </div>
+ </div>
+ <div class="attendance-grid" id="attendanceGrid">
+ <!-- Attendance cards will be added here dynamically-->
+ </div>
+ </div>
+ <script>
+ let currentTab = 'today';
+ function updateDashboard() {
+ const attendanceData =
+ JSON.parse(localStorage.getItem('attendanceData') || '[]');
+ const filteredData = filterDataByTab(attendanceData);
+ updateGrid(filteredData);
+updateStats(filteredData);
+ }
+ function filterDataByTab(data) {
+ const now = new Date();
+ const startOfDay = new Date(now.getFullYear(), now.getMonth(),
+ now.getDate());
+ const startOfWeek = new Date(now.setDate(now.getDate()
+now.getDay()));
+ const startOfMonth = new Date(now.getFullYear(),
+ now.getMonth(), 1);
+ return data.filter(entry => {
+ const entryDate = new Date(entry.punchIn);
+ switch (currentTab) {
+ case 'today':
+ return entryDate >= startOfDay;
+ case 'week':
+ return entryDate >= startOfWeek;
+ case 'month':
+ return entryDate >= startOfMonth;
+ default:
+ return true;
+ }
+ });
+ }
+ function updateGrid(data) {
+ const grid = document.getElementById('attendanceGrid');
+ grid.innerHTML = '';
+ data.forEach(entry => {
+ const card = createAttendanceCard(entry);
+ grid.appendChild(card);
+ });
+ }
+ // function createAttendanceCard(entry) {
+ //
+ const card = document.createElement('div');
+ //
+ card.className = 'attendance-card';
+//
+ //
+ const duration = entry.punchOut ?
+ ((new Date(entry.punchOut)- new Date(entry.punchIn)) /
+ (1000 * 60 * 60)).toFixed(2) + ' hours' :
+ //
+ 'Active';
+ //
+ //
+ //
+ //
+ //
+ card.innerHTML = `
+ <h3>${entry.name}</h3>
+ <p>ID: ${entry.id}</p>
+ <p>Punch In: ${formatTime(new Date(entry.punchIn))}</p>
+ <p>Punch Out: ${entry.punchOut ? formatTime(new
+ Date(entry.punchOut)) : 'Not punched out'}</p>
+ //
+ <p>Duration: ${duration}</p>
+ //
+ <span class="status
+ ${entry.status}">${entry.status.toUpperCase()}</span>
+ //
+ `;
+ //
+ // }
+ return card;
+ function createAttendanceCard(entry) {
+ const card = document.createElement('div');
+ card.className = 'attendance-card';
+ const duration = entry.punchOut ?
+ ((new Date(entry.punchOut)- new Date(entry.punchIn)) / (1000 * 60
+ * 60)).toFixed(2) + ' hours' :
+ 'Active';
+ const formattedDate = new
+ Date(entry.punchIn).toLocaleDateString(undefined, {
+ year: 'numeric',
+ month: 'short',
+ day: 'numeric'
+ });
+ card.innerHTML = `
+ <h3>${entry.name}</h3>
+ <p>ID: ${entry.id}</p>
+ <p>Date: ${formattedDate}</p>
+<p>Punch In: ${formatTime(new Date(entry.punchIn))}</p>
+ <p>Punch Out: ${entry.punchOut ? formatTime(new
+ Date(entry.punchOut)) : 'Not punched out'}</p>
+ <p>Duration: ${duration}</p>
+ <span class="status
+ ${entry.status}">${entry.status.toUpperCase()}</span>
+ `;
+ return card;
+ }
+ function formatTime(date) {
+ return date.toLocaleTimeString();
+ }
+ function updateStats(data) {
+ const presentCount = data.filter(e => e.status ===
+ 'in').length;
+ const lateCount = data.filter(e => {
+ const punchInHour = new Date(e.punchIn).getHours();
+ return punchInHour >= 9;
+ }).length;
+ const completedShifts = data.filter(e => e.punchOut);
+ const avgHours = completedShifts.length ?
+ (completedShifts.reduce((acc, curr) =>
+ acc + (new Date(curr.punchOut)- new
+ Date(curr.punchIn)) / (1000 * 60 * 60), 0) /
+ completedShifts.length).toFixed(1) :
+ 0;
+ document.getElementById('presentCount').textContent =
+ presentCount;
+ document.getElementById('lateCount').textContent = lateCount;
+ document.getElementById('avgHours').textContent = avgHours;
+ }
+ function switchTab(tab) {
+ currentTab = tab;
+document.querySelectorAll('.tab').forEach(t =>
+ t.classList.remove('active'));
+ document.querySelector(`.tab:nth-child(${['today', 'week',
+ 'month'].indexOf(tab) + 1})`).classList.add('active');
+ updateDashboard();
+ }
+ function searchEmployees() {
+ const query =
+ document.getElementById('searchInput').value.toLowerCase();
+ const attendanceCards =
+ document.querySelectorAll('.attendance-card');
+ attendanceCards.forEach(card => {
+ const name =
+ card.querySelector('h3').textContent.toLowerCase();
+ const id =
+ card.querySelector('p:nth-child(2)').textContent.toLowerCase();
+ if (name.includes(query) || id.includes(query)) {
+ card.style.display = '';
+ } else {
+ card.style.display = 'none';
+ }
+ });
+ }
+ function displayCurrentDate() {
+ const currentDateElem =
+ document.getElementById('currentDate');
+ const now = new Date();
+ const options = { weekday: 'long', year: 'numeric', month:
+ 'long', day: 'numeric' };
+ currentDateElem.textContent =
+ now.toLocaleDateString(undefined, options);
+ }
+ document.addEventListener('DOMContentLoaded', () => {
+ displayCurrentDate();
+ updateDashboard();
+ });
+</script>
+ </body>
+ </html>
+ <!DOCTYPE html>
+ <html lang="en">
+ <head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Admin Dashboard</title>
+ <style>
+ /* Your CSS styles remain unchanged */
+ * {
+ margin: 0;
+ padding: 0;
+ box-sizing: border-box;
+ font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+ }
+ body {
+ background: #f0f2f5;
+ }
+ .container {
+ max-width: 1200px;
+ margin: 0 auto;
+ padding: 20px;
+ }
+ .header {
+ background: linear-gradient(135deg, #2193b0, #6dd5ed);
+ color: white;
+ padding: 20px;
+ border-radius: 10px;
+ margin-bottom: 20px;
+ box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+ display: flex;
+ justify-content: space-between;
+ align-items: center;
+ }
+.header a {
+ color: white;
+ text-decoration: none;
+ padding: 10px 20px;
+ border: 2px solid white;
+ border-radius: 5px;
+ transition: all 0.3s ease;
+ }
+ .header a:hover {
+ background: white;
+ color: #2193b0;
+ }
+ .current-date {
+ font-size: 1rem;
+ margin-top: 5px;
+ }
+ .stats {
+ display: grid;
+ grid-template-columns: repeat(3, 1fr);
+ gap: 20px;
+ margin-bottom: 20px;
+ }
+ .stat-card {
+ background: white;
+ padding: 20px;
+ border-radius: 10px;
+ text-align: center;
+ box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+ }
+ .stat-number {
+ font-size: 2em;
+ font-weight: bold;
+ color: #2193b0;
+ }
+.tabs {
+ display: flex;
+ gap: 10px;
+ margin-bottom: 20px;
+ }
+ .tab {
+ padding: 10px 20px;
+ background: white;
+ border-radius: 5px;
+ cursor: pointer;
+ transition: all 0.3s ease;
+ }
+ .tab.active {
+ background: #2193b0;
+ color: white;
+ }
+ .search {
+ margin-bottom: 20px;
+ }
+ .search input {
+ width: 100%;
+ padding: 10px;
+ border: 1px solid #ddd;
+ border-radius: 5px;
+ }
+ .attendance-grid {
+ display: grid;
+ grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+ gap: 20px;
+ }
+ .attendance-card {
+ background: white;
+ border-radius: 10px;
+padding: 15px;
+ box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+ transition: transform 0.3s ease;
+ }
+ .attendance-card:hover {
+ transform: translateY(-5px);
+ }
+ .status {
+ display: inline-block;
+ padding: 5px 10px;
+ border-radius: 15px;
+ font-size: 0.8em;
+ margin-top: 10px;
+ }
+ .status.in {
+ background: #e8f5e9;
+ color: #4CAF50;
+ }
+ .status.out {
+ background: #ffebee;
+ color: #f44336;
+ }
+ @media (max-width: 768px) {
+ .stats {
+ grid-template-columns: 1fr;
+ }
+ }
+ </style>
+ </head>
+ <body>
+ <div class="container">
+ <div class="header">
+ <div>
+ <h1>Admin Dashboard</h1>
+ <div class="current-date" id="currentDate"></div>
+</div>
+ <a href="../employee attendance/1.html">&larr; Back to Punch
+ In/Out</a>
+ </div>
+ <div class="tabs">
+ <div class="tab active"
+ onclick="switchTab('today')">Today</div>
+ <div class="tab" onclick="switchTab('week')">This Week</div>
+ <div class="tab" onclick="switchTab('month')">This Month</div>
+ </div>
+ <div class="search">
+ <input type="text" id="searchInput" placeholder="Search
+ employees..." onkeyup="searchEmployees()">
+ </div>
+ <div class="stats">
+ <div class="stat-card">
+ <div class="stat-number" id="presentCount">0</div>
+ <div>Present Today</div>
+ </div>
+ <div class="stat-card">
+ <div class="stat-number" id="lateCount">0</div>
+ <div>Late Arrivals</div>
+ </div>
+ <div class="stat-card">
+ <div class="stat-number" id="avgHours">0</div>
+ <div>Avg Hours Today</div>
+ </div>
+ </div>
+ <div class="attendance-grid" id="attendanceGrid">
+ <!-- Attendance cards will be added here dynamically-->
+ </div>
+ </div>
+ <script>
+ let currentTab = 'today';
+function updateDashboard() {
+ const attendanceData =
+ JSON.parse(localStorage.getItem('attendanceData') || '[]');
+ const filteredData = filterDataByTab(attendanceData);
+ updateGrid(filteredData);
+ updateStats(filteredData);
+ }
+ function filterDataByTab(data) {
+ const now = new Date();
+ const startOfDay = new Date(now.getFullYear(), now.getMonth(),
+ now.getDate());
+ const startOfWeek = new Date(now.setDate(now.getDate()
+now.getDay()));
+ const startOfMonth = new Date(now.getFullYear(),
+ now.getMonth(), 1);
+ return data.filter(entry => {
+ const entryDate = new Date(entry.punchIn);
+ switch (currentTab) {
+ case 'today':
+ return entryDate >= startOfDay;
+ case 'week':
+ return entryDate >= startOfWeek;
+ case 'month':
+ return entryDate >= startOfMonth;
+ default:
+ return true;
+ }
+ });
+ }
+ function updateGrid(data) {
+ const grid = document.getElementById('attendanceGrid');
+ grid.innerHTML = '';
+ data.forEach(entry => {
+ const card = createAttendanceCard(entry);
+ grid.appendChild(card);
+ });
+}
+ // function createAttendanceCard(entry) {
+ //
+ const card = document.createElement('div');
+ //
+ //
+ //
+ card.className = 'attendance-card';
+ const duration = entry.punchOut ?
+ ((new Date(entry.punchOut)- new Date(entry.punchIn)) /
+ (1000 * 60 * 60)).toFixed(2) + ' hours' :
+ //
+ 'Active';
+ //
+ //
+ //
+ //
+ //
+ card.innerHTML = `
+ <h3>${entry.name}</h3>
+ <p>ID: ${entry.id}</p>
+ <p>Punch In: ${formatTime(new Date(entry.punchIn))}</p>
+ <p>Punch Out: ${entry.punchOut ? formatTime(new
+ Date(entry.punchOut)) : 'Not punched out'}</p>
+ //
+ <p>Duration: ${duration}</p>
+ //
+ <span class="status
+ ${entry.status}">${entry.status.toUpperCase()}</span>
+ //
+ `;
+ //
+ // }
+ return card;
+ function createAttendanceCard(entry) {
+ const card = document.createElement('div');
+ card.className = 'attendance-card';
+ const duration = entry.punchOut ?
+ ((new Date(entry.punchOut)- new Date(entry.punchIn)) / (1000 * 60
+ * 60)).toFixed(2) + ' hours' :
+ 'Active';
+ const formattedDate = new
+ Date(entry.punchIn).toLocaleDateString(undefined, {
+ year: 'numeric',
+ month: 'short',
+ day: 'numeric'
+ });
+card.innerHTML = `
+ <h3>${entry.name}</h3>
+ <p>ID: ${entry.id}</p>
+ <p>Date: ${formattedDate}</p>
+ <p>Punch In: ${formatTime(new Date(entry.punchIn))}</p>
+ <p>Punch Out: ${entry.punchOut ? formatTime(new
+ Date(entry.punchOut)) : 'Not punched out'}</p>
+ <p>Duration: ${duration}</p>
+ <span class="status
+ ${entry.status}">${entry.status.toUpperCase()}</span>
+ `;
+ return card;
+ }
+ function formatTime(date) {
+ return date.toLocaleTimeString();
+ }
+ function updateStats(data) {
+ const presentCount = data.filter(e => e.status ===
+ 'in').length;
+ const lateCount = data.filter(e => {
+ const punchInHour = new Date(e.punchIn).getHours();
+ return punchInHour >= 9;
+ }).length;
+ const completedShifts = data.filter(e => e.punchOut);
+ const avgHours = completedShifts.length ?
+ (completedShifts.reduce((acc, curr) =>
+ acc + (new Date(curr.punchOut)- new
+ Date(curr.punchIn)) / (1000 * 60 * 60), 0) /
+ completedShifts.length).toFixed(1) :
+ 0;
+ document.getElementById('presentCount').textContent =
+ presentCount;
+ document.getElementById('lateCount').textContent = lateCount;
+document.getElementById('avgHours').textContent = avgHours;
+ }
+ function switchTab(tab) {
+ currentTab = tab;
+ document.querySelectorAll('.tab').forEach(t =>
+ t.classList.remove('active'));
+ document.querySelector(`.tab:nth-child(${['today', 'week',
+ 'month'].indexOf(tab) + 1})`).classList.add('active');
+ updateDashboard();
+ }
+ function searchEmployees() {
+ const query =
+ document.getElementById('searchInput').value.toLowerCase();
+ const attendanceCards =
+ document.querySelectorAll('.attendance-card');
+ attendanceCards.forEach(card => {
+ const name =
+ card.querySelector('h3').textContent.toLowerCase();
+ const id =
+ card.querySelector('p:nth-child(2)').textContent.toLowerCase();
+ if (name.includes(query) || id.includes(query)) {
+ card.style.display = '';
+ } else {
+ card.style.display = 'none';
+ }
+ });
+ }
+ function displayCurrentDate() {
+ const currentDateElem =
+ document.getElementById('currentDate');
+ const now = new Date();
+ const options = { weekday: 'long', year: 'numeric', month:
+ 'long', day: 'numeric' };
+ currentDateElem.textContent =
+ now.toLocaleDateString(undefined, options);
+ }
+document.addEventListener('DOMContentLoaded', () => {
+ displayCurrentDate();
+ updateDashboard();
+ });
+ </script>
+ </body>
+ </html>
